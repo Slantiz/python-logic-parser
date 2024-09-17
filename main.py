@@ -5,9 +5,16 @@ OPERATORS: dict[str, Exp] = {
     "not": UnaryExp(logic.lnot),
     "and": BinaryExp(logic.land),
     "or": BinaryExp(logic.lor),
-    "imp": BinaryExp(logic.limplies)
+    "imp": BinaryExp(logic.limp),
+    "if": BinaryExp(logic.lif),
+    "iff": BinaryExp(logic.liff)
 }
 
+RIGHT_ASSOCIATIVE: list[str] = [
+    "imp",
+    "if",
+    "iff"
+]
 
 def is_operator(s: str):
     return s.casefold() in OPERATORS
@@ -69,6 +76,7 @@ def create_expression_level(tokens: list[str], variables: dict[str, AtomicExp]) 
     
     for op, op_targets in operators.items():
         cls = OPERATORS.get(op)
+        if op in RIGHT_ASSOCIATIVE: op_targets.reverse()
         for targets in op_targets:
             exp = cls.copy()
             exp.apply(targets, expressions)
@@ -76,22 +84,23 @@ def create_expression_level(tokens: list[str], variables: dict[str, AtomicExp]) 
     return expressions[0]
 
 
-# input
-s = "(P and Q) or C imp (D or Q)"
+while True:
+    s = input("Expression: ")
 
-exp, variables = create_expression(s)
+    exp, variables = create_expression(s)
 
-header = ""
-for v_name in variables.keys():
-    header += f"{v_name} "
+    header = ""
+    for v_name in variables.keys():
+        header += f"{v_name} "
 
-print(header)
+    print(header)
 
-for i in range(2**len(variables)):
-    s = ""
-    for n, v in enumerate(variables.values()):
-        v.value = not int(i / 2**(len(variables) - n - 1)) % 2 == 0
-        s += f"{1 if v.value else 0} "
-    
-    s += f"{exp.eval()}"
-    print(s)
+    for i in range(2**len(variables)):
+        s = ""
+        for n, v in enumerate(variables.values()):
+            v.value = not int(i / 2**(len(variables) - n - 1)) % 2 == 0
+            s += f"{1 if v.value else 0} "
+        
+        s += f"{exp.eval()}"
+        print(s)
+    print()
