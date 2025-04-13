@@ -7,7 +7,10 @@ OPERATORS: dict[str, Exp] = {
     "or": BinaryExp(logic.lor),
     "imp": BinaryExp(logic.limp),
     "if": BinaryExp(logic.lif),
-    "iff": BinaryExp(logic.liff)
+    "iff": BinaryExp(logic.liff),
+    "nand": BinaryExp(logic.lnand),
+    "nor": BinaryExp(logic.lnor),
+    "xor": BinaryExp(logic.lxor),
 }
 
 RIGHT_ASSOCIATIVE: list[str] = [
