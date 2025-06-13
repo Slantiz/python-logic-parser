@@ -20,3 +20,15 @@ def lif(p: bool, q: bool):
 
 def liff(p: bool, q: bool):
     return limp(p, q) and lif(p, q)
+
+
+def lnand(p: bool, q: bool):
+    return not p or not q
+
+
+def lnor(p: bool, q: bool):
+    return not p and not q
+
+
+def lxor(p: bool, q: bool):
+    return p or q and not (p and q)
