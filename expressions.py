@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import Callable
 
 class Exp:
-    def eval() -> bool: pass
-    def apply(self, targets: list[int], expressions: list[Exp | int]) -> Exp: pass
-    def copy() -> Exp: pass
+    def eval(self) -> bool: ...
+    def apply(self, targets: list[int], expressions: list[Exp | int]) -> Exp: ...
+    def copy(self) -> Exp: ...
 
 
 class AtomicExp(Exp):
@@ -36,9 +36,13 @@ class UnaryExp(Exp):
         return self.operand(self.expression.eval())
     
     def apply(self, targets: list[int], expressions: list[Exp | int]):
-        while isinstance(expressions[targets[0]], int): targets[0] = expressions[targets[0]]
-        self.expression = expressions[targets[0]]
-        expressions[targets[0]] = self
+        i = targets[0]
+        target = expressions[i]
+        while isinstance(target, int):
+            i = target
+            target = expressions[i]
+        self.expression = target
+        expressions[i] = self
         return self
 
     def copy(self):
@@ -58,12 +62,22 @@ class BinaryExp(Exp):
         return self.operand(self.left_expression.eval(), self.right_expression.eval())
     
     def apply(self, targets: list[int], expressions: list[Exp | int]):
-        while isinstance(expressions[targets[0]], int): targets[0] = expressions[targets[0]]
-        while isinstance(expressions[targets[1]], int): targets[1] = expressions[targets[1]]
-        self.left_expression = expressions[targets[0]]
-        self.right_expression = expressions[targets[1]]
-        expressions[targets[1]] = targets[0]
-        expressions[targets[0]] = self
+        li = targets[0]
+        left = expressions[li]
+        while isinstance(left, int):
+            li = left
+            left = expressions[li]
+
+        ri = targets[1]
+        right = expressions[ri]
+        while isinstance(right, int):
+            ri = right
+            right = expressions[ri]
+
+        self.left_expression = left
+        self.right_expression = right
+        expressions[ri] = li
+        expressions[li] = self
         return self
     
     def copy(self):

@@ -25,12 +25,7 @@ def is_operator(s: str):
 
 def create_expression(s: str):
     # split variables with parenthesis
-    new_s = ""
-    for l in s:
-        if l == "(" or l == ")": new_s += f" {l} "
-        else: new_s += l
-
-    tokens = new_s.strip().split()
+    tokens = s.replace("(", " ( ").replace(")", " ) ").split()
 
     variables: dict[str, AtomicExp] = {}
 
@@ -53,8 +48,9 @@ def create_expression_level(tokens: list[str], variables: dict[str, AtomicExp]) 
     while i < len(tokens):
         t = tokens[i]
         if is_operator(t):
-            if isinstance(OPERATORS[t], UnaryExp): operators[t].append([num_expressions])
-            elif isinstance(OPERATORS[t], BinaryExp): operators[t].append([num_expressions - 1, num_expressions])
+            op = t.casefold()
+            if isinstance(OPERATORS[op], UnaryExp): operators[op].append([num_expressions])
+            elif isinstance(OPERATORS[op], BinaryExp): operators[op].append([num_expressions - 1, num_expressions])
             i += 1
             continue
 
@@ -73,18 +69,20 @@ def create_expression_level(tokens: list[str], variables: dict[str, AtomicExp]) 
             i = closing_i + 1
             continue
                 
-        expressions.append(variables.get(t))
+        expressions.append(variables[t])
         num_expressions += 1
         i += 1
     
     for op, op_targets in operators.items():
-        cls = OPERATORS.get(op)
+        cls = OPERATORS[op]
         if op in RIGHT_ASSOCIATIVE: op_targets.reverse()
         for targets in op_targets:
             exp = cls.copy()
             exp.apply(targets, expressions)
     
-    return expressions[0]
+    root = expressions[0]
+    assert not isinstance(root, int)
+    return root
 
 
 while True:

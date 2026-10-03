@@ -31,4 +31,4 @@ def lnor(p: bool, q: bool):
 
 
 def lxor(p: bool, q: bool):
-    return p or q and not (p and q)
+    return (p or q) and not (p and q)
